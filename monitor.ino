@@ -13,10 +13,9 @@ const char* password  = "yourpassword";
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec      = -6 * 3600;   // GMT+7
 const int   daylightOffset_sec = 0;
-//added by me
+//added to synctime
 static unsigned long lastSyncMs = 0;
-//const unsigned long SYNC_EVERY_MS = 12UL * 60UL * 60UL * 1000UL; // 12 hours
-//const unsigned long SYNC_EVERY_MS = 1UL * 60UL * 1000UL; // 1 minute
+//wifi timesync lapse period
 const unsigned long SYNC_EVERY_MS = 1UL * 60UL * 60UL * 1000UL; // 1 hour
 
 
@@ -228,8 +227,7 @@ bool connectWiFiAndSyncTime(bool showUI) {
       delay(800);
     }
 
-    //added by me
-    // Optional: wait until time is actually set (ESP32)
+    //Added to control wakeup sync
     struct tm timeinfo;
     bool ok = getLocalTime(&timeinfo, 5000);  // up to 5s
 
@@ -258,7 +256,7 @@ bool connectWiFiAndSyncTime(bool showUI) {
     isSyncingTime = false;
     drawSyncDotIcon(); // clears it
     
-    //added by me
+    // Disconnect WiFi to save power
     WiFi.disconnect(true);
     WiFi.mode(WIFI_OFF);
     return false;
@@ -1079,7 +1077,8 @@ void setup() {
 
 // ========= LOOP =========
 void loop() {
-  /*
+  //Removed this code because it was always checking for the wifi to be connected
+  /* 
   static unsigned long lastWifiCheck = 0;
   if (millis() - lastWifiCheck > 10000) {
     lastWifiCheck = millis();
@@ -1088,7 +1087,7 @@ void loop() {
     }
   }*/
 
-  //added by me 
+  //Added to synctime on period chosen in SYNC_EVERY_MS
   unsigned long nowMs = millis();
 
   if (nowMs - lastSyncMs >= SYNC_EVERY_MS) {
